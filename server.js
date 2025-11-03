@@ -24,9 +24,13 @@ app.use(express.urlencoded({ extended: true }));
 // Cookie parser
 app.use(cookieParser());
 
-// CORS middleware
+// CORS middleware - UPDATED FOR PRODUCTION
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  origin: [
+    'https://ai-token-tracker-dashboard.vercel.app',
+    'http://localhost:3000',
+    'https://your-frontend-domain.vercel.app'
+  ],
   credentials: true
 }));
 
@@ -41,24 +45,32 @@ app.use('/api/auth', authRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/ai', aiRoutes);
 
-// Health check route
+// Health check route - UPDATED
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'AI Token Tracker API is running',
+    message: 'AI Token Tracker API is running on Render',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    baseUrl: process.env.BASE_URL
   });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/dist'));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'));
+// Root route
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to AI Token Tracker Backend API',
+    version: '1.0.0',
+    documentation: 'https://github.com/PRITAM-TU/AI-Token-Tracker-Dashboard-',
+    endpoints: {
+      auth: '/api/auth',
+      logs: '/api/logs', 
+      ai: '/api/ai',
+      health: '/api/health'
+    }
   });
-}
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -74,7 +86,8 @@ app.use((err, req, res, next) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'Route not found',
+    path: req.originalUrl
   });
 });
 
@@ -82,7 +95,7 @@ const PORT = process.env.PORT || 5000;
 
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  console.log(`📊 API Health: http://localhost:${PORT}/api/health`);
+  console.log(`📊 API Base URL: ${process.env.BASE_URL || `http://localhost:${PORT}`}`);
 });
 
 // Handle unhandled promise rejections

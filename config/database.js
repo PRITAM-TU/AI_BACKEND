@@ -10,11 +10,21 @@ const connectDB = async () => {
       useUnifiedTopology: true,
     });
 
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`📊 Database: ${conn.connection.name}`);
   } catch (error) {
-    console.error('Database connection error:', error.message);
+    console.error('❌ Database connection error:', error.message);
     process.exit(1);
   }
 };
+
+// Handle MongoDB connection events
+mongoose.connection.on('disconnected', () => {
+  console.log('❌ MongoDB disconnected');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('❌ MongoDB connection error:', err);
+});
 
 export default connectDB;
