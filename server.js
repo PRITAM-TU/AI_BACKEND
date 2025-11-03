@@ -27,12 +27,13 @@ app.use(cookieParser());
 // CORS middleware - UPDATED FOR PRODUCTION
 app.use(cors({
   origin: [
-    'https://ai-token-tracker-dashboard.vercel.app',
-    'http://localhost:3000',
-    'https://your-frontend-domain.vercel.app'
+    'https://ai-token-tracker-dashboard-6fx1.vercel.app',
+    'http://localhost:3000' // for local development
+    
   ],
   credentials: true
 }));
+app.use(cors());
 
 // Rate limiting (simple version)
 app.use((req, res, next) => {
